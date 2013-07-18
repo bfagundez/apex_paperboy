@@ -29,5 +29,5 @@ apex_client = SforceApexClient(
             metadata_server_url=client.getMetadaServerUrl(),
             server_url=mm_util.get_sfdc_endpoint_by_type('enterprise'))
 
-# VICTORY!
-apex_client.executeAnonymous({"body":"System.Debug('pepe');"})
+# Execute code
+apex_client.executeAnonymous({"body":"System.Debug('foo');"})
