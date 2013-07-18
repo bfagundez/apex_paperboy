@@ -1,0 +1,132 @@
+<html>
+<head>
+    <title>MavensMate</title>
+    <link rel="stylesheet" href="{{ base_path }}/lib/ui/resources/bootstrap/css/bootstrap.css"></link> 
+    <link rel="stylesheet" href="{{ base_path }}/lib/ui/resources/bootstrap/css/bootstrap-responsive.css"></link> 
+    <link rel="stylesheet" href="{{ base_path }}/lib/ui/resources/css/flat-ui.css"></link> 
+    <link rel="stylesheet" href="{{ base_path }}/lib/ui/resources/css/mavensmate.css"></link> 
+    <link rel="stylesheet" href="{{ base_path }}/lib/ui/resources/css/dynatree.css"></link> 
+    <link rel="stylesheet" href="{{ base_path }}/lib/ui/resources/css/font-awesome.min.css"></link>
+    <link rel="stylesheet" href="{{ base_path }}/lib/ui/resources/css/ext-theme-neptune-all.css"></link>
+    <script src="{{ base_path }}/lib/ui/resources/js/jquery.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/jqueryui.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/bootstrap-select.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/flatui-checkbox.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/dynatree2.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/mavensmate.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/jquery.tablescroll.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/ext-all.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/ext-theme-neptune.js" type="text/javascript"></script>
+    <script src="{{ base_path }}/lib/ui/resources/js/TriStateTree.js" type="text/javascript"></script>
+    <script>
+        $.ajaxSetup({
+            headers: { "mm_plugin_client": "{{ client }}" }
+        });
+
+        $(function() {
+            //instantiate tabs on page, if any
+            $('.nav-tabs a').click(function (e) {
+              e.preventDefault();
+              $(this).tab('show');
+            })
+
+            //clicking on close "x" hides message (and resizes elements)
+            $('#result_output .close').click(function() {
+                $('#result_output').hide();
+                resizeElements();
+            })
+
+            //fancy select boes
+            $("select.info").selectpicker({style: 'btn-info'});
+
+            //when the windows resizes, resize everything accordingly
+            $(window).resize(function() {
+                resizeElements()
+
+                $(".twipsy").height($(window).height())
+                $(".twipsy").width($(window).width())
+            });
+
+            //focus first input
+            $("input[type='text']:first").focus(); //focus first input element
+        })
+
+        function notify_sound() {
+            if ({{ play_sounds()|lower }}) {
+                var snd = new Audio("{{ base_path }}/lib/ui/resources/sounds/pling.mp3"); // buffers automatically when created
+                snd.play();  
+            }
+        }
+    </script>
+</head>
+<body id="body" class="{% block body_class %}{% endblock %}">
+  	
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="container">
+                <img src="{{ base_path }}/lib/ui/resources/images/logo2.png" id="mmlogo"/> 
+                <div class="actions-right">
+                    {% block buttons %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-wrapper">
+    		<div id="global_message_wrapper">
+                <div class="alert alert-error">
+                    <button type="button" class="close fui-cross" data-dismiss="alert"></button>
+                    <p id="global_message"></p>
+                </div>
+            </div>
+            {% block yield %}{% endblock %}
+        </div>
+    </div>
+
+        <div class="loading">
+            <div class="twipsy"></div> 
+            <div class="loading_message_wrapper">
+                <div class="loading_message">
+
+                    <div id="floatingCirclesG">
+                    <div class="f_circleG" id="frotateG_01">
+                    </div>
+                    <div class="f_circleG" id="frotateG_02">
+                    </div>
+                    <div class="f_circleG" id="frotateG_03">
+                    </div>
+                    <div class="f_circleG" id="frotateG_04">
+                    </div>
+                    <div class="f_circleG" id="frotateG_05">
+                    </div>
+                    <div class="f_circleG" id="frotateG_06">
+                    </div>
+                    <div class="f_circleG" id="frotateG_07">
+                    </div>
+                    <div class="f_circleG" id="frotateG_08">
+                    </div>
+                    </div>
+
+                    <span id="loading_message"></span>
+
+                </div>
+            </div>                                    
+        </div>
+        {% block body_js %}{% endblock %}
+        <script>
+            $(function() {
+                //set up global ajax handling
+                try {
+                    setUpAjaxErrorHandling()
+                } catch(e) {
+                    console.log(e)
+                }
+
+                //$('input[type="checkbox"]').checkbox();
+                resizeElements()
+            })
+        </script>
+</body>
+</html>

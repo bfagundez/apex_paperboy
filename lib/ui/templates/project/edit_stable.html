@@ -1,0 +1,298 @@
+{% extends "layouts/base.html" %}
+{% block yield %}
+<div id="result_output">
+	<div class="alert alert-error">
+		<button type="button" class="close fui-cross"></button>
+		<span id="error_message"></span>
+	</div>
+</div>
+
+
+<div class="content">
+	
+	<ul class="nav nav-tabs nav-append-content">
+		<li class="active">
+			<a id="project_details_tab" href="#form" data-toggle="tab">Project Details</a>
+		</li>
+		<li>
+			<a href="#metadata" data-toggle="tab">
+				Project Metadata &nbsp;&nbsp;
+				<span onclick="index_org(true)" class="label" style="line-height:15px;cursor:pointer;">Refresh <i class="icon-refresh"></i></span> 	
+			</a>
+</a>
+		</li>
+	</ul>
+	
+	<div class="tab-content" id="main-tab-content">  
+		<div id="form" class="tab-pane active">
+			<form class="form-stacked">
+				<fieldset>
+					<div class="control-group large disabled">
+						<input class="span12" placeholder="Project Name" type="text" id="pn" disabled="disabled">
+						<i class="input-icon fui-lock"></i>
+					</div>
+					<div class="control-group large">
+						<input class="span12" placeholder="Salesforce.com Username" type="text" id="un">
+					</div>
+					<div class="control-group large">
+						<input class="span12" placeholder="Salesforce.com Password" type="password" id="pw">
+					</div>
+
+					<div class="clearfix">
+						<select id="org_type" class="info">
+							<option value="production">Production</option>
+							<option value="developer">Developer</option>
+							<option value="sandbox">Sandbox</option>
+							<option value="prerelease">Prerelease</option>
+						</select>
+					</div>
+					<div class="clearfix" style="margin-top:20px;">
+						<a class="btn btn-success" onclick="updateProjectCreds();">
+							Update Credentials &nbsp <i class="icon-user"></i>
+						</a>
+					</div> 												
+				</fieldset>
+			</form>
+		</div>
+		<div id="metadata" class="tab-pane">
+			<div class="alert alert-info" id="filter">
+				<input type="text" placeholder="Search for metadata" id="txtFilter" style="width:300px;height:35px;" />
+				<div class="select-wrapper">
+					<select id="meta_type" class="">
+						
+					</select>
+				</div>
+				<a href="#" class="btn btn-success" id="search-btn"><i class="icon-search"></i></a>
+			</div>
+			<div id="project_wrapper">
+				<div id="treewrapper" style="height:100%; padding-bottom:100px;">
+					<div id="tree">
+						<ul>
+							{{ tree_body }}
+						</ul>
+					</div>
+					<div id="info"></div>
+				</div>
+			</div>				
+    	</div>
+	</div>
+</div>  
+{% endblock %}  
+
+{% block buttons %}					
+	<input type="button" id="btnSubmit" class="btn btn-info" value="Update Project"  onclick="updateProject();">
+	<button type="reset" class="btn" onclick="window.close();">Cancel</button>
+{% endblock %}  
+
+{% block body_js %}
+
+	<script type="text/javascript">
+		var mm_cpd = '{{ project_location }}';
+		var has_indexed_metadata = {{ has_indexed_metadata|lower }};
+		var operation;
+		var child_def = {};
+		var rootNode;
+		var search_worker;
+		function updateProjectCreds() {
+			console.log('updating project creds')
+			operation = "update_creds"
+			$.ajax({
+				type: "POST",
+				url: "http://127.0.0.1:9000/project/creds", 
+				data: JSON.stringify({
+					username 			: $("#un").val(),
+			    	password 			: $("#pw").val(),
+			    	org_type 			: $("#org_type").val(),
+			    	override_session 	: true,
+			    	defer_connection 	: true,
+			    	project_name 		: '{{ name }}' 
+				}),
+				beforeSend: function() { showLoading('Updating project credentials'); },
+				complete: function(data){
+					console.log(data)				
+					var response = JSON.parse(data.responseText)
+					if (response["success"] == false) {
+						show_message(response["body"])
+					} else {
+						show_message(response["body"], 'success')
+					}
+					hideLoading();
+				}
+			});
+		}
+
+		function updateProject() {
+			console.log('updating project')
+			operation = "update"
+			$.ajax({
+				type: "POST",
+				url: "http://127.0.0.1:9000/project/edit", 
+				data: JSON.stringify({
+					package 		: get_tree(),
+					project_name 	: '{{ name }}'
+				}),
+				beforeSend: function() { showLoading('Updating project'); },
+				complete: function(data){
+					global_init_handler(data)
+				} 
+			});
+		}
+
+		function index_org(refresh) {
+			console.log('indexing org')
+			operation = "index"
+			$.ajax({
+				type: "POST",
+				url: "http://127.0.0.1:9000/project/index", 
+				data: JSON.stringify({
+					project_name 	: '{{ name }}'
+				}),
+				beforeSend: function() { showLoading('Indexing your Salesforce.com metadata.  This operation could take a while depending on the size of your org.<br/><br/>Thanks for being patient! :)'); },
+				complete: function(data, status, xhr){
+					global_init_handler(data)				
+				} 
+			});
+		}
+
+		function handle_response(response) {
+			if (operation == "index") {
+				if (response["success"] == false) {
+					show_message(response["body"])
+				} else {
+					$("#tree").dynatree("destroy")
+					$("#tree ul").html(response["body"]);
+					$('#meta_type').html('')
+					$("#tree ul > li.level1").each(function() {
+						$('#meta_type').append('<option>'+$(this).attr('id')+'</option>')
+					});
+					$("#tree").dynatree({
+						persist: false,
+						checkbox: true,
+						selectMode: 3,
+						filter: {
+							mode: "hide"
+						}
+					});
+					$("#tree").dynatree("getRoot").visit(function(node) {
+		        		node.expand(false);
+		    		});  
+					rootNode = $("#tree").dynatree("getRoot");
+				}
+				notify_sound()
+				hideLoading();
+			} else if (operation == "update") {
+				if (response["success"] == false) {
+					show_message(response["body"])
+				} else {
+					show_message("Project updated successfully", "success")
+				}
+				notify_sound()
+				hideLoading();
+			}
+			resizeProjectWrapper()
+		}
+			
+		$(function() {		
+			$("#pn").val("{{ name }}");  
+			$("#un").val("{{ username }}");
+			$("#pw").val("{{ password }}");
+			$("#org_type").val("{{ org_type }}");
+			
+			$("#pn").prop('disabled', true);  
+			$('#meta_type').html('')
+			$("#tree ul > li.level1").each(function() {
+				$('#meta_type').append('<option>'+$(this).attr('id')+'</option>')
+			});
+
+			$(window).resize(function() {
+				resizeProjectWrapper()
+			});
+
+			$("ul.nav-tabs li a span").hover(
+				function() {
+					$(this).addClass("label-success")
+				},
+				function() {
+					$(this).removeClass("label-success")
+				}
+			)
+
+		    window.resizeTo(700, 750)
+		    centerWindow()
+
+		    $("#btnDeselectAll").click(function(){
+				$("#tree").dynatree("getRoot").visit(function(node){   		
+					if ($(node.li).css('display') != 'none') { 
+						try {
+							if (node.data.level > 1)
+								node.select(false);
+						} catch(e) {
+							node.select(false);   				
+						}
+					}
+				});
+				return false;
+			});
+			$("#btnSelectAll").click(function(){
+				$("#tree").dynatree("getRoot").visit(function(node){		   			
+					if ($(node.li).css('display') != 'none') {
+						try {
+							if (node.data.level > 1)
+								node.select(true);
+						} catch(e) {
+							node.select(true);   				
+						}
+					}   		
+				});
+				return false;
+			});
+
+			$("#txtFilter").bind('keyup', function(e) {
+				var code = (e.keyCode ? e.keyCode : e.which);
+				if (code == 13) {
+					submitSearch()
+				}
+			})
+			.change(function() {
+				var filter = $("#txtFilter").val();
+				if (!filter) {
+					clearFilter();
+					scrollToTop("#project_wrapper");	
+				}
+			})
+			.keyup(function() {
+		        $(this).change();
+		    });
+
+		    $("#search-btn").click(function() {
+		    	if ($(this).hasClass('btn-success')) {
+		    		submitSearch()
+		    	} else {
+		    		clearFilter()
+		    	}
+		    })
+
+			//brief pause
+			setTimeout(function(){	
+				if (!has_indexed_metadata) {
+					index_org();
+				} else {
+					$("#tree").dynatree({
+						persist: false,
+						checkbox: true,
+						selectMode: 3,
+						debugLevel: 0
+					});
+					// $("#tree").dynatree("getRoot").visit(function(node) {
+					// 	node.expand(false);
+					// });  
+					rootNode = $("#tree").dynatree("getRoot");
+
+					resizeProjectWrapper()
+				}
+			}, 200);
+
+		});
+	</script>
+
+{% endblock %}

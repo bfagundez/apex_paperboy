@@ -1,0 +1,256 @@
+{% extends "layouts/base.html" %}
+{% block yield %}
+<style>
+
+	.deploy_options label, .deploy_options div.divlabel {
+		width:180px;
+		font-weight: bold;
+	}
+
+	.deploy_options label {
+		text-align: left;
+	}
+
+	.deploy_options .clearfix {
+		margin-left: 20px;
+		margin-bottom:10px;
+	}
+	
+	.deploy_options input[type="checkbox"] {
+		margin: 0px;
+		width: 32px;
+		float: left;
+	}
+	.deploy_options .clearfix label > div {
+		float: left;
+		width: auto;
+		font-weight: bold;
+		padding-top: 5px;
+		cursor: pointer;
+	}
+	
+</style>
+<div class="content" id="content1">	
+	<div class="alert-message error" style="display:none;">
+		<p><strong id="error_message"></strong></p>
+	</div>
+	<div class="alert-message success" style="display:none;">
+		<p><strong>Success!</strong> You're operation completed sucessfully</p>
+	</div>
+
+	<ul class="tabs">
+	  <li class="active"><a href="#new">New Log</a></li>
+	  <li><a href="#logs">Active Logs</a></li>
+	</ul> 
+
+	<div class="pill-content">
+	  <div id="logs">
+  		<div class="alert-message block-message-custom" style="margin-bottom:0px;padding: 5px;-webkit-border-radius: 4px 4px 0px 0px;">
+				<p style="float:left;"><strong>Debug Logs</strong></p>
+			<div style="clear:both;"></div>	
+		</div>  
+		<table class="bordered-table test_result" style="-webkit-border-radius: 0px 0px 4px 4px;">
+			<thead>
+				<tr>
+					<th>User</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody id="connections_list">
+				{% for l in logs %}
+					<tr>
+						<td>{{ l['name'] }}</td>
+						<td>
+							<a href="javascript:void(0);" onclick="deleteLog('{{ l['id'] }}')">Delete</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	  </div>
+	  <div id="new" class="active">
+	  		<form>
+				<fieldset>
+					<div class="clearfix">
+						<label for="un_list">Debug Log User</label> 
+						<select style="width:90%;" id="un_list" data-placeholder="Select a user">
+							{% for u in users %}
+								<option value="{{ u['Id'] }};">
+									{{ u['Name'] }}
+								</option>
+							{% endfor %} 
+						</select>	
+					</div>			
+				</fieldset>
+
+				<fieldset class="deploy_options" style="margin:0;padding-top:20px;">
+					
+			    
+					<div class="clearfix">
+						<label for="select-Db" >Database Log Level</label>
+						<select id="select-Db">
+							<option value="">None</option>
+							<option value="ERROR">ERROR</option>
+							<option value="WARN">WARN</option>
+							<option value="INFO">INFO</option>
+							<option value="DEBUG">DEBUG</option>
+							<option value="FINE">FINE</option>
+							<option value="FINER">FINER</option>
+							<option value="FINEST">FINEST</option>
+						</select>
+					</div>
+
+					<div class="clearfix">
+						<label for="select-Workflow" >Workflow Log Level</label>
+						<select id="select-Workflow">
+							<option value="">None</option>
+							<option value="ERROR">ERROR</option>
+							<option value="WARN">WARN</option>
+							<option value="INFO">INFO</option>
+							<option value="DEBUG">DEBUG</option>
+							<option value="FINE">FINE</option>
+							<option value="FINER">FINER</option>
+							<option value="FINEST">FINEST</option>
+						</select>
+					</div>
+
+					<div class="clearfix">
+						<label for="select-Validation" >Validation Log Level</label>
+						<select id="select-Validation">
+							<option value="">None</option>
+							<option value="ERROR">ERROR</option>
+							<option value="WARN">WARN</option>
+							<option value="INFO">INFO</option>
+							<option value="DEBUG">DEBUG</option>
+							<option value="FINE">FINE</option>
+							<option value="FINER">FINER</option>
+							<option value="FINEST">FINEST</option>
+						</select>
+					</div>
+
+					<div class="clearfix">
+						<label for="select-Callout" >Callout Log Level</label>
+						<select id="select-Callout">
+							<option value="">None</option>
+							<option value="ERROR">ERROR</option>
+							<option value="WARN">WARN</option>
+							<option value="INFO">INFO</option>
+							<option value="DEBUG">DEBUG</option>
+							<option value="FINE">FINE</option>
+							<option value="FINER">FINER</option>
+							<option value="FINEST">FINEST</option>
+						</select>
+					</div>
+
+					<div class="clearfix">
+						<label for="select-Apex_code" >Apex Code Log Level</label>
+						<select id="select-Apex_code">
+							<option value="">None</option>
+							<option value="ERROR">ERROR</option>
+							<option value="WARN">WARN</option>
+							<option value="INFO">INFO</option>
+							<option value="DEBUG" selected="selected">DEBUG</option>
+							<option value="FINE">FINE</option>
+							<option value="FINER">FINER</option>
+							<option value="FINEST">FINEST</option>
+						</select>
+					</div>
+
+					<div class="clearfix">
+						<label for="select-Apex_profiling" >Apex Profiling Log Level</label>
+						<select id="select-Apex_profiling">
+							<option value="">None</option>
+							<option value="ERROR">ERROR</option>
+							<option value="WARN">WARN</option>
+							<option value="INFO">INFO</option>
+							<option value="DEBUG">DEBUG</option>
+							<option value="FINE">FINE</option>
+							<option value="FINER">FINER</option>
+							<option value="FINEST">FINEST</option>
+						</select>
+					</div>
+
+				</fieldset>
+
+
+			</form>
+	  </div>
+	  <div id="log">
+	    <div id="log_coverage_wrapper" style="-webkit-border-radius: 4px 4px 4px 4px;overflow-y:auto;padding:10px;position:relative;">
+			
+		</div>
+	  </div>
+	</div> 
+</div>
+
+<form class="form-stacked" id="action_buttons" style="padding-left:12px;">
+	<fieldset style="padding-top:0px;position:relative;">
+		<div class="actions">					
+			<input type="button" class="btn primary" value="Execute" onclick="execute_apex()" id="btnExecuteApex"> 
+			&nbsp;
+			<button type="reset" class="btn" onclick="window.close();">Cancel</button>
+		</div>
+		<img src="{{ base_path }}/lib/ui/resources/images/big_loading.gif" style="position:absolute;top:13px;right:25px;width:36px;display:none;" id="running_tests_indicator"/>
+	</fieldset>
+</form>
+
+
+<script>
+
+function new_log() {
+	$.ajax({
+		type: "POST",
+		url: "http://127.0.0.1:9000/debug/log", 
+		dataType: "json",
+		contentType: 'application/json; charset=utf-8',
+		data: JSON.stringify({
+			 user_id 			: $("#userid").val(),
+			 project_name 		: '{{ name }}',
+			 debug_categories 	: get_log_levels_json()
+		}),
+		beforeSend: function() { showLoading('Creating Debug Log'); },
+		complete: function(data){	
+			global_init_handler(data)		
+		} 
+	});
+}
+
+function handle_response(response) {
+	console.log(response)
+	try {
+		if (response["success"] == true) {
+			
+		} else {
+			
+		}
+	} catch(e) {
+		console.log(e)
+	}
+	
+	hideLoading();
+}
+
+function resize() {
+	window.resizeTo(575, 625);
+}
+
+function resize_height() {
+	window.resizeTo(window.width, document.getElementById('content1').offsetHeight+180);
+}
+
+function resize_editor() {
+	$("#editor_wrapper").css("width", $(window).width() - 25)
+	$("#editor_wrapper").css("height", $(window).height() - 180)
+}
+
+$(function(){
+	$('.tabs').tabs()
+	window.moveTo((screen.width-675)/2,(screen.height-document.getElementById('content1').offsetHeight-400)/2)
+});
+
+$(window).resize(function() {
+
+});
+
+</script>
+{% endblock %}

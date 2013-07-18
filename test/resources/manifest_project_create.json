@@ -1,0 +1,17 @@
+{
+	"project_name" 	: "MavensMateUnitTestProject",
+    "username"    	: "mm@force.com",
+    "password"    	: "force",
+    "org_type"    	: "developer",
+    "vc_username"  	: "",
+    "vc_password"  	: "",    
+    "vc_url"       	: "",
+    "vc_type"      	: "",
+    "vc_branch"    	: "",
+    "package"      	: {
+    	"ApexClass" 	: ["MultiselectControllerTest","MultiselectController"],
+    	"ApexPage"		: "*",
+    	"ApexComponent" : "*",
+    	"CustomObject"	: ["Account", "Opportunity", "Lead"]
+    }
+}

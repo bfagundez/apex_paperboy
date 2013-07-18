@@ -1,0 +1,80 @@
+{% for item in metadata %}
+     {% if 'children' in item and item['children']|length > 0 %}
+          {% set class_name = "folder" %}
+     {% else %}
+          {% set class_name = "" %}
+     {% endif %}
+     {% if 'childXmlNames' in item['type'] %}
+          {% set has_child_types = True %}
+     {% else %}
+          {% set has_child_types = False %}
+     {% endif %}
+     <li data="level: 1, hasChildTypes: {{ has_child_types|lower }}, inFolder: {{ item['type']['inFolder']|lower }}" id="{{ item['type']['xmlName'] }}" class="{{ level_1_selected }}{{ " " }}folder{{ " " }}level1">{{ item['type']['xmlName'] }}                        
+          {% if item['children'] %}
+          <ul>
+               {% for child in item['children'] %}
+                    {% if 'children' in child and child['children']|length > 0 %}
+                         {% set child_class_name = "folder" %}
+                    {% else %}
+                         {% set child_class_name = "" %}
+                    {% endif %}
+
+                    {% if level_1_selected == "selected" %}
+                         {% set level_2_selected = "selected" %}
+                    {% else %}
+                         {% if 'selected' in child and child['selected'] == True %}
+                         	{% set level_2_selected = "selected" %}
+                         {% else %}
+                         	{% set level_2_selected = "" %}
+                         {% endif %}
+                    {% endif %}
+
+                    <li data="level: 2" id="{{ child['key'] }}" class="{{ level_2_selected }}{{ " " }}{{ child_class_name }}{{ " " }}level2">{{ child['title'] }}
+                    	
+                    	{% if 'children' in child and child['children']|length > 0 %}
+
+	                        <ul>
+	                           	{% for gchild in child['children'] %}
+	                              	
+	                           		{% if level_1_selected == "selected" %}
+	                           		     {% set level_3_selected = "selected" %}
+	                           		{% else %}
+	                           		     {% if 'selected' in gchild and gchild['selected'] == True %}
+				                         	{% set level_3_selected = "selected" %}
+				                         {% else %}
+				                         	{% set level_3_selected = "" %}
+				                         {% endif %}
+	                           		{% endif %}
+
+	                              	<li data="level: 3" class="{{ level_3_selected }}{{ " " }}level3">{{ gchild['title'] }}
+	                            		{% if 'children' in gchild and gchild['children']|length > 0 %}
+	                          				<ul>
+	                                 			{% for ggchild in gchild['children'] %}
+	                            					
+	                                 				{% if level_1_selected == "selected" %}
+	                                 				     {% set level_4_selected = "selected" %}
+	                                 				{% else %}
+	                                 				     {% if 'selected' in ggchild and ggchild['selected'] == True %}
+								                         	{% set level_4_selected = "selected" %}
+								                         {% else %}
+								                         	{% set level_4_selected = "" %}
+								                         {% endif %}
+	                                 				{% endif %}
+
+	                            					<li data="level: 4" class="{{ level_4_selected }}{{ " " }}level4">{{ ggchild['title'] }}</li>
+
+	                                      		{% endfor %}
+	                                  		</ul>
+	                              		{% endif %}
+	                               	</li>
+	                         	{% endfor %}
+	                        </ul>
+	                    {% endif %}
+
+
+                    </li>
+               {% endfor %}
+          </ul>
+          {% endif %}
+     </li>
+{% endfor %}
