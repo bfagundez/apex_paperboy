@@ -17,9 +17,11 @@ develop-eggs
 .installed.cfg
 lib
 lib64
-
+venv
 # Installer logs
 pip-log.txt
+
+apexcommands.apex
 
 # Unit test / coverage reports
 .coverage
