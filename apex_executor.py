@@ -9,7 +9,6 @@ from optparse import OptionParser
 
 logging.basicConfig(format='[=] %(asctime)s | %(levelname)s | %(message)s [%(module)s:%(lineno)d]  ',datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
 logging.info('Loading libs')
-import ipdb
 import lib.mm_util as mm_util
 import time
 
