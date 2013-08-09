@@ -53,7 +53,12 @@ else:
       try:
             # login using partner wsdl
             logging.info('Authenticating')
-            client.login(options.user,options.password,options.token)
+            # sometimes password and token are provided together.
+            # token parameter is not required.
+            token_safe = ''
+            if options.token:
+                  token_safe = options.token
+            client.login(options.user,options.password,token_safe)
 
             # use token with apex wsdl
             apex_wsdl_location = os.path.join(mm_util.WSDL_PATH, 'apex.xml')
