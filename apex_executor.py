@@ -33,9 +33,6 @@ if options.user == None:
 if options.password == None:
       missing_args = True
       error_log = error_log + "~ Salesforce password is required \n"
-if options.token == None:
-      missing_args = True
-      error_log = error_log + "~ Salesforce token is required \n"
 if options.apexscriptfilename == None:
       missing_args = True
       error_log = error_log + "~ Apex script filename is required \n"
