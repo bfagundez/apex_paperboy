@@ -15,13 +15,7 @@ Usage:
 	./apex_executor.py -u salesforce_user -p salesforce_password -t salesforce_token -s filename_containing_apex_code
 ```
 
-or
-
-```	
-	./apex_executor.py -u salesforce_user -p salesforce_password -t salesforce_token -s filename_containing_apex_code
-```
-
-or 
+or concatenate password and token:
 
 ```	
 	./apex_executor.py -u salesforce_user -p salesforce_password+salesforce_token  -s filename_containing_apex_code
