@@ -1,3 +1,4 @@
+#! /usr/bin/python
 import logging
 from lib.sforce.base import SforceBaseClient
 from suds import WebFault
@@ -93,7 +94,7 @@ else:
                   
 
       except Exception, e:
-            logging.error('Exception found:'+str(e.message)) 
+            logging.error(str(e.message)) 
       
       
      
