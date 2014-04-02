@@ -58,7 +58,7 @@ else:
           sid=None,
           metadata_server_url=None,
           server_url=None)
-    print OKGREEN+'√'+ENDC+' WSDL loaded \n '
+    print OKGREEN+'✓'+ENDC+' WSDL loaded \n '
   except Exception, e:
     print '\n'+NOTOKRED+'✗'+ENDC+' Unable to load the WSDL '
     print e.message
@@ -84,7 +84,7 @@ else:
                 metadata_server_url=client.getMetadaServerUrl(),
                 server_url=mm_util.get_sfdc_endpoint_by_type('enterprise'))
 
-    print OKGREEN+'√'+ENDC+' Authentication succesful. \n '
+    print OKGREEN+'✓'+ENDC+' Authentication succesful. \n '
 
   except Exception, e:
     print '\n'+NOTOKRED+'✗'+ENDC+' Error during authentication '
@@ -96,7 +96,7 @@ else:
     # open script file
     f = open(options.apexscriptfilename, "r")
     apex_code = f.read()
-    print OKGREEN+'√'+ENDC+' File loaded succesfully. \n '
+    print OKGREEN+'✓'+ENDC+' File loaded succesfully. \n '
   except Exception, e:
     print '\n'+NOTOKRED+'✗'+ENDC+' Error found reading the file '
     print e.message
@@ -109,7 +109,7 @@ else:
     apex_execution = apex_client.executeAnonymous({"body":apex_code})
 
     if apex_execution.success:
-      print OKGREEN+'√'+ENDC+' Script executed succesfully 🍻 \n '
+      print OKGREEN+'✓'+ENDC+' Script executed succesfully 🍻 \n '
       print 'Code executed in '+str(time.clock() - t0)+ ' seconds. \n'
     else:
       print NOTOKRED+'✗'+ENDC+' Errors found: '
